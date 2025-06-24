@@ -24,8 +24,9 @@ public class MybatisPostRepository implements PostRepository{
     }
 
     @Override
-    public void insert(Post post) {
+    public Post insert(Post post) {
         postMapper.insert(post);
+        return post;
     }
 
     @Override
