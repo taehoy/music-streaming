@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>게시판</title></head>
+<body>
+<h1>게시판 목록</h1>
+<a th:href="@{/post/new}">글쓰기</a>
+<ul>
+    <li th:each="post : ${posts}">
+        <a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}"></a>
+        <span th:text="${post.author}"></span>
+        <span th:text=" | 게시날짜 ${post.createdAt}|"></span>
+    </li>
+</ul>
+</body>
+</html>
