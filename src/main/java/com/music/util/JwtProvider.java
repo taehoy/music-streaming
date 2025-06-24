@@ -1,6 +1,7 @@
 package com.music.util;
 
 import com.music.domain.User;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -12,7 +13,7 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
-    //todo : secretKey 보안 향상 : 실제 서비스에서는 .env, application.yml, AWS Secret Manager 같은 데서 가져옴
+    //todo : secretKey 보안 해야할거같은데,,?
     private final String secretKey = "this-is-a-very-very-long-and-secure-key-1234567890!!!";
     private final long accessTokenExpiration = 1000 * 60 * 60; // 1시간
 
@@ -25,6 +26,39 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(user.getLoginId())
                 .claim("username", user.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String getLoginId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    public String generateRefreshToken(User user) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000L); // 7일
+
+        return Jwts.builder()
+                .setSubject(user.getLoginId())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)

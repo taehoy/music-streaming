@@ -1,9 +1,13 @@
 package com.music.controller;
 
+import com.music.domain.RefreshToken;
 import com.music.domain.SignUpRequest;
+import com.music.domain.User;
 import com.music.domain.request.LoginRequest;
 import com.music.domain.response.ErrorResponse;
 import com.music.service.AuthService;
+import com.music.service.UserService;
+import com.music.util.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +26,10 @@ import java.util.Map;
 @Slf4j
 public class AuthController {
 
+    private final UserService userService;
     private final AuthService authService;
+    private final JwtProvider jwtProvider;
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest request) {
@@ -39,14 +46,19 @@ public class AuthController {
         }
     }
 
+    /**
+     * 로그인 기능
+     * @param request
+     * @return
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
         try {
-            log.info("로그인 요청");
-            String accessToken = authService.login(request);
-            log.info("로그인 요청 종료후 엑세스토큰 : " + accessToken);
+            log.info("로그인 요청: {}", request.loginId());
+            Map<String, String> tokens = authService.login(request);
+            log.info("로그인 성공: accessToken={}, refreshToken={}", tokens.get("accessToken"), tokens.get("refreshToken"));
 
-            return ResponseEntity.ok(Map.of("accessToken", accessToken));
+            return ResponseEntity.ok(tokens); // ✅ accessToken + refreshToken 모두 응답
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(
@@ -55,5 +67,26 @@ public class AuthController {
                             "message", e.getMessage()
                     ));
         }
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+
+        if (!jwtProvider.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 유효하지 않습니다.");
+        }
+
+        String loginId = jwtProvider.getLoginId(refreshToken);
+        RefreshToken saved = authService.findByLoginId(loginId);
+
+        if (saved == null || !saved.getRefreshToken().equals(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 일치하지 않습니다.");
+        }
+
+        User user = userService.findByLoginId(loginId);
+        String newAccessToken = jwtProvider.generateAccessToken(user);
+
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 }

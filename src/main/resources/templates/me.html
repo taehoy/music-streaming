@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>내 정보</title>
+</head>
+<body>
+<h2>내 정보</h2>
+  <div id="user-info"></div>
+  <p id="error-message" style="color:red;"></p>
+
+  <button onclick="logout()">로그아웃</button>
+
+
+<script>
+  async function loadUserInfo() {
+    const res = await authenticatedFetch("/api/me");
+    if (res.ok) {
+      const user = await res.json();
+      document.getElementById("user-info").innerHTML = `
+          <p><strong>Login ID:</strong> ${user.loginId}</p>
+          <p><strong>Username:</strong> ${user.username}</p>
+        `;
+    } else {
+      document.getElementById("error-message").innerText = "인증 실패";
+      logout();
+    }
+  }
+
+  loadUserInfo();
+</script>
+</body>
+</html>

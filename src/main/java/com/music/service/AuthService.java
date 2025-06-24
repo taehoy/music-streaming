@@ -1,22 +1,27 @@
 package com.music.service;
 
+import com.music.domain.RefreshToken;
 import com.music.domain.SignUpRequest;
 import com.music.domain.User;
 import com.music.domain.request.LoginRequest;
+import com.music.repository.AuthRepository;
 import com.music.repository.UserRepository;
 import com.music.util.JwtProvider;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -36,7 +41,7 @@ public class AuthService {
         return saveUser;
     }
 
-    public String login(LoginRequest request) {
+    public Map<String, String> login(LoginRequest request) {
         User user = userRepository.findByLoginId(request.loginId());
 
         // 비밀번호 유효성 점검
@@ -44,6 +49,26 @@ public class AuthService {
             throw new IllegalArgumentException("로그인 ID 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        return jwtProvider.generateAccessToken(user);
+        // 엑세스토큰, 리프레쉬 토큰 발급
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        authRepository.deleteByLoginId(user.getLoginId()); // 기존 토큰 제거
+        authRepository.save(
+                RefreshToken.builder()
+                        .loginId(request.loginId())
+                        .refreshToken(refreshToken)
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
+
+        return Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken
+        );
+    }
+
+    public RefreshToken findByLoginId(String loginId) {
+        return authRepository.findByLoginId(loginId);
     }
 }

@@ -19,6 +19,7 @@
     <hr>
     <a th:href="@{/signup}">회원가입</a>
 
+    <script th:src="@{/js/auth.js}"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -37,9 +38,8 @@
             });
 
             const result = await res.json();
-
-            if (res.ok && result.accessToken) {
-                localStorage.setItem("accessToken", result.accessToken);
+            if (res.ok) {
+                storeTokens(result); // ✅ accessToken + refreshToken 저장
                 window.location.href = "/";
             } else {
                 document.getElementById("error-message").innerText = result.message || "로그인 실패";
