@@ -9,6 +9,10 @@
         <a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}"></a>
         <span th:text="${post.author}"></span>
         <span th:text=" | 게시날짜 ${post.createdAt}|"></span>
+        <a th:href="@{'/post/' + ${post.id} + '/edit'}">수정</a>
+        <form th:action="@{'/post/' + ${post.id} + '/delete'}" method="post" style="display:inline">
+            <button type="submit">삭제</button>
+        </form>
     </li>
 </ul>
 </body>

@@ -29,4 +29,17 @@ public class PostService {
         post.setCreatedAt(LocalDateTime.now());
         postRepository.insert(post);
     }
+
+    public void updatePost(Long id, String title, String content) {
+        Post post = postRepository.findById(id);
+        if (post != null) {
+            post.setTitle(title);
+            post.setContent(content);
+            postRepository.update(post);
+        }
+    }
+
+    public void deletePost(Long id) {
+        postRepository.delete(id);
+    }
 }

@@ -18,4 +18,16 @@
         VALUES (#{title}, #{content}, #{author}, #{createdAt})
     </insert>
 
+    <update id="update" parameterType="Post">
+        UPDATE posts
+        SET title = #{title},
+            content = #{content}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM posts
+        WHERE id = #{id}
+    </delete>
+
 </mapper>
