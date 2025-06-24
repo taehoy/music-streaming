@@ -11,4 +11,15 @@ public class Post {
     private String content;
     private String author;
     private LocalDateTime createdAt;
+
+    public Post() {
+    }
+
+    public Post(Long id, String title, String content, String author, LocalDateTime createdAt) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.createdAt = createdAt;
+    }
 }
