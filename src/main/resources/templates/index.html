@@ -9,6 +9,34 @@
 
     <p>로그인 없이도 이 페이지는 누구나 볼 수 있어요!</p>
 
-    <a th:href="@{/login}">로그인하러 가기</a>
+    <div id="auth-buttons"></div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/login";
+        }
+
+        function showAuthButtons() {
+            const token = localStorage.getItem("accessToken");
+            const authDiv = document.getElementById("auth-buttons");
+
+            if (token) {
+                // ✅ 로그인 상태 → 로그아웃 버튼
+                authDiv.innerHTML = `
+          <a href="/me.html">내 정보</a>
+          <button onclick="logout()">로그아웃</button>
+        `;
+            } else {
+                // ✅ 비로그인 상태 → 로그인/회원가입 버튼
+                authDiv.innerHTML = `
+          <a href="/login">로그인</a> |
+          <a href="/signup">회원가입</a>
+        `;
+            }
+        }
+
+        showAuthButtons();
+    </script>
 </body>
 </html>
