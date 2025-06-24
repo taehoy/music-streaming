@@ -19,7 +19,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    @GetMapping("/")
+    @GetMapping("/posts")
     public String index(Model model) {
         List<Post> posts = postService.getAllPosts();
         model.addAttribute("posts", posts);
@@ -27,7 +27,7 @@ public class PostController {
         for (Post post : posts) {
             log.info(post.toString());
         }
-        return "index";
+        return "posts";
     }
 
     @GetMapping("/post/{id}")
@@ -48,7 +48,7 @@ public class PostController {
                          @RequestParam String content,
                          @RequestParam String author) {
         postService.createPost(title, content, author);
-        return "redirect:/";
+        return "redirect:/posts";
     }
 
     @GetMapping("/post/{id}/edit")
@@ -69,6 +69,6 @@ public class PostController {
     @PostMapping("/post/{id}/delete")
     public String delete(@PathVariable Long id) {
         postService.deletePost(id);
-        return "redirect:/";
+        return "redirect:/posts";
     }
 }
