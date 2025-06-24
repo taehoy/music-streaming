@@ -18,13 +18,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","signup","/css/**","/auth/**").permitAll()
+                        .requestMatchers("/","signup","/css/**","/auth/**", "login").permitAll()
                         .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")    // 로그인 페이지
-                        .defaultSuccessUrl("/") // 로그인 성공시 홈으로 이동
-                        .permitAll());
+                );
 
         return http.build();
     }

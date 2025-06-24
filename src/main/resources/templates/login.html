@@ -7,21 +7,44 @@
 <body>
     <h2>로그인</h2>
 
-    <form th:action="@{/login}" method="post">
-      <div>
-        <label for="username">로그인 ID:</label>
-        <input type="text" id="username" name="username">
-      </div>
-      <div>
-        <label for="password">비밀번호:</label>
-        <input type="password" id="password" name="password">
-      </div>
-      <div>
+    <form id="login-form">
+        <label for="loginId">로그인 ID:
+        <input type="text" id="loginId" name="loginId" required></label><br>
+        <label for="password">비밀번호:
+        <input type="password" id="password" name="password" required></label><br>
         <button type="submit">로그인</button>
-      </div>
     </form>
+    <p id="error-message" style="color:red;"></p>
 
     <hr>
     <a th:href="@{/signup}">회원가입</a>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const data = {
+                loginId: formData.get("loginId"),
+                password: formData.get("password")
+            };
+
+            const res = await fetch("/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.accessToken) {
+                localStorage.setItem("accessToken", result.accessToken);
+                window.location.href = "/";
+            } else {
+                document.getElementById("error-message").innerText = result.message || "로그인 실패";
+            }
+        });
+    </script>
 </body>
 </html>
