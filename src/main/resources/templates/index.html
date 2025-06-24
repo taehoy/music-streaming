@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>게시판</title></head>
-<body>
-<h1>게시판 목록</h1>
-<a th:href="@{/post/new}">글쓰기</a>
-<ul>
-    <li th:each="post : ${posts}">
-        <a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}"></a>
-        <span th:text="${post.author}"></span>
-        <span th:text=" | 게시날짜 ${post.createdAt}|"></span>
-        <a th:href="@{'/post/' + ${post.id} + '/edit'}">수정</a>
-        <form th:action="@{'/post/' + ${post.id} + '/delete'}" method="post" style="display:inline" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-            <button type="submit">삭제</button>
-        </form>
-    </li>
-</ul>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>게시판</title>
+        <link rel="stylesheet" th:href="@{/css/board.css}">
+    </head>
+    <body>
+        <h1>게시판 목록</h1>
+        <a th:href="@{/post/new}" class="write-btn">글쓰기</a>
+
+        <ul class="post-list">
+            <li th:each="post : ${posts}" class="post-item">
+                <a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}" class="post-title" ></a>
+                <div class="post-meta">
+                    <span th:text="${post.author}">작성자</span> |
+                    <span th:text="${post.createdAt}">날짜</span>
+                </div>
+
+                <a th:href="@{'/post/' + ${post.id} + '/edit'}">수정</a>
+                <form th:action="@{'/post/' + ${post.id} + '/delete'}" method="post"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit">삭제</button>
+                </form>
+            </li>
+        </ul>
+    </body>
 </html>

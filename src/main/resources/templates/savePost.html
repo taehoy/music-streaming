@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>글쓰기</title></head>
+<head>
+    <title>글쓰기</title>
+    <link rel="stylesheet" th:href="@{/css/board.css}">
+</head>
 <body>
-<h1>글쓰기</h1>
-<form th:action="@{/post}" method="post">
-    제목: <input type="text" name="title"/><br/>
-    내용: <textarea name="content"></textarea><br/>
-    작성자: <input type="text" name="author"/><br/>
-    <button type="submit">등록</button>
-</form>
+    <h1>글쓰기</h1>
+
+    <form th:action="@{/post}" method="post">
+        <label>
+            제목:
+            <input type="text" name="title" required/>
+        </label><br/><br/>
+        <label>
+            내용:<br/>
+            <textarea name="content" rows="5" cols="50" required></textarea>
+        </label><br/><br/>
+
+        <label>
+            작성자:
+            <input type="text" name="author" required/>
+        </label><br/><br/>
+
+        <button type="submit" class="write-btn">등록</button>
+    </form>
+
 </body>
 </html>
