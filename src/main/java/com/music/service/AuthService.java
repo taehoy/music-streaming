@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +43,10 @@ public class AuthService {
     }
 
     public Map<String, String> login(LoginRequest request) {
-        User user = userRepository.findByLoginId(request.loginId());
+        Optional<User> user = userRepository.findByLoginId(request.loginId());
 
         // 비밀번호 유효성 점검
-        if(user == null || !passwordEncoder.matches(request.password(), user.getPassword())){
+        if(user == null || !passwordEncoder.matches(request.password(), user.get().getPassword())){
             throw new IllegalArgumentException("로그인 ID 또는 비밀번호가 올바르지 않습니다.");
         }
 
@@ -53,7 +54,7 @@ public class AuthService {
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
 
-        authRepository.deleteByLoginId(user.getLoginId()); // 기존 토큰 제거
+        authRepository.deleteByLoginId(user.get().getLoginId()); // 기존 토큰 제거
         authRepository.save(
                 RefreshToken.builder()
                         .loginId(request.loginId())

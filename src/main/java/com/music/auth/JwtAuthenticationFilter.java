@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (jwtProvider.validateToken(token)) {
                     String loginId = jwtProvider.getLoginId(token);
-                    User user = userRepository.findByLoginId(loginId);
+                    Optional<User> user = userRepository.findByLoginId(loginId);
 
                     if (user != null) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

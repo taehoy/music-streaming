@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtProvider {
@@ -19,13 +20,13 @@ public class JwtProvider {
 
     Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(Optional<User> user) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
-                .setSubject(user.getLoginId())
-                .claim("username", user.getUsername())
+                .setSubject(user.get().getLoginId())
+                .claim("username", user.get().getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -53,12 +54,12 @@ public class JwtProvider {
         }
     }
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(Optional<User> user) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000L); // 7일
 
         return Jwts.builder()
-                .setSubject(user.getLoginId())
+                .setSubject(user.get().getLoginId())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)

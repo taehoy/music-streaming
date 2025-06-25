@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -84,7 +85,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 일치하지 않습니다.");
         }
 
-        User user = userService.findByLoginId(loginId);
+        Optional<User> user = userService.findByLoginId(loginId);
         String newAccessToken = jwtProvider.generateAccessToken(user);
 
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
