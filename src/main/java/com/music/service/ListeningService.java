@@ -1,7 +1,8 @@
 package com.music.service;
 
+import com.music.domain.ListeningLog;
 import com.music.domain.dto.ListeningLogMessage;
-import com.music.infrastructure.kafka.ListeningLogProducer;
+import com.music.repository.ListeningLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +12,21 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ListeningService {
     private final RankingService rankingService;
-    private final ListeningLogProducer logProducer;
+//    private final ListeningLogProducer logProducer;
+    private final ListeningLogRepository listeningLogRepository;
 
     public void playMusic(Long userId, Long musicId) {
         // 1. Redis 점수 증가
         rankingService.increasePlayCount(musicId);
-        // 2. kafka 메시지 전송
-        ListeningLogMessage message = ListeningLogMessage.builder()
+
+        ListeningLog log = ListeningLog.builder()
                 .userId(userId)
                 .musicId(musicId)
                 .playedAt(LocalDateTime.now())
-                .build();
+                .createdAt(LocalDateTime.now()).build();
 
-        logProducer.send(message);
+
+        listeningLogRepository.save(log);
 
     }
 
