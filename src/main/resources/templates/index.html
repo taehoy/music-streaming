@@ -12,6 +12,29 @@
 
     <div id="auth-buttons"></div>
 
+    <h1>실시간 차트</h1>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>순위</th>
+            <th>제목</th>
+            <th>아티스트</th>
+            <th>앨범</th>
+            <th>커버</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="music, stat : ${chart}">
+            <td th:text="${stat.index + 1}"></td>
+            <td th:text="${music.title}"></td>
+            <td th:text="${music.artist}"></td>
+            <td th:text="${music.album}"></td>
+            <td><img th:src="${music.coverImageUrl}" width="50"/></td>
+        </tr>
+        </tbody>
+    </table>
+
     <script>
         function logout() {
             localStorage.removeItem("accessToken");
