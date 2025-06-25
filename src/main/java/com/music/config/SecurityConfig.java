@@ -26,10 +26,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 off
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/signup","/css/**","/auth/**", "/login", "/posts","/js/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                .requestMatchers("/*", "/signup", "/css/**", "/auth/**", "/login", "/posts", "/js/**").permitAll()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll() // 테스트용
+                );
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
