@@ -9,6 +9,19 @@
         d.setDate(d.getDate() - 1);
         return d.toISOString().slice(0, 10); // yyyy-MM-dd
       }
+
+      function getKoreaYesterdayDateString() {
+        const now = new Date();
+
+        // UTC 기준 시간 + 9시간 → 한국 시간으로 보정
+        now.setHours(now.getHours() + 9);
+
+        // 어제로 이동
+        now.setDate(now.getDate() - 1);
+
+        return now.toISOString().slice(0, 10); // yyyy-MM-dd
+      }
+
       async function fetchChart() {
         const date = document.getElementById("chartDate").value;
         if(!date) return;
@@ -51,7 +64,7 @@
 
       window.onload = function () {
         const dateInput = document.getElementById("chartDate");
-        const yesterdayStr = getYesterdayDateString();
+        const yesterdayStr = getKoreaYesterdayDateString();
         dateInput.value = yesterdayStr;
         fetchChart();
       };
