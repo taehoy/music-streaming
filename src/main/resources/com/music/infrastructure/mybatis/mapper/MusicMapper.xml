@@ -13,11 +13,12 @@
         <result property="duration" column="duration"/>
         <result property="coverImageUrl" column="cover_image_url"/>
         <result property="createdAt" column="created_at"/>
+        <result property="youtubeUrl" column="youtube_url"/>
     </resultMap>
 
     <insert id="insert" parameterType="Music">
-        INSERT INTO music (title, artist, album, genre, duration, cover_image_url, created_at)
-        VALUES (#{title}, #{artist}, #{album}, #{genre}, #{duration}, #{coverImageUrl}, #{createdAt})
+        INSERT INTO music (title, artist, album, genre, duration, cover_image_url, created_at, youtube_url)
+        VALUES (#{title}, #{artist}, #{album}, #{genre}, #{duration}, #{coverImageUrl}, #{createdAt}, #{youtubeUrl})
     </insert>
 
     <select id="findById" resultMap="musicResultMap">

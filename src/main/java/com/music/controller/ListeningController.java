@@ -4,10 +4,7 @@ import com.music.service.ListeningService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -16,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ListeningController {
     private final ListeningService listeningService;
 
-    @PostMapping("/{musicId}")
+    @PostMapping()
     public ResponseEntity<?> play(@RequestParam("userId") Long userId,
                                   @RequestParam("musicId") Long musicId) {
         log.info("음원 재생 : musicID = {}, userId = {}", musicId, userId);

@@ -17,6 +17,7 @@ public class ChartService {
     private final MusicRepository musicRepository;
 
     public List<RealtimeChartResponse> getRealtimeChart(int limit) {
+        // redis에서 순위 추출
         List<Long> topIds = rankingService.getTopMusicIds(limit);
 
         return topIds.stream()
@@ -27,13 +28,16 @@ public class ChartService {
                 .collect(Collectors.toList());
     }
 
-    private RealtimeChartResponse toResponse(Music music) {
+    public RealtimeChartResponse toResponse(Music music) {
         return RealtimeChartResponse.builder()
                 .musicId(music.getId())
                 .title(music.getTitle())
                 .artist(music.getArtist())
                 .album(music.getAlbum())
+                .youtubeUrl(RealtimeChartResponse.extractYoutubeId(music.getYoutubeUrl()))
                 .coverImageUrl(music.getCoverImageUrl())
                 .build();
     }
+
+
 }

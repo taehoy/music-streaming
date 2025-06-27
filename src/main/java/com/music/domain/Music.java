@@ -16,5 +16,6 @@ public class Music {
     private int duration; // 초 단위
     private String coverImageUrl;
     private LocalDateTime createdAt;
+    private String youtubeUrl; // https://www.youtube.com/watch?v=음원주소
 
 }
