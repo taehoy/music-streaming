@@ -27,6 +27,55 @@
 
         function openAddModal(musicId) {
             selectedMusicId = musicId;
+            loadPlaylistList();
+            document.getElementById("playlistModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("playlistModal").style.display = "none";
+            selectedMusicId = null;
+        }
+
+        function addToPlaylist(playlistId) {
+            fetch(`/api/playlists/${playlistId}/music`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ musicId: selectedMusicId })
+            }).then(res => {
+                if (res.ok) {
+                    alert("플레이리스트에 추가 완료!");
+                } else {
+                    alert("추가 실패 (중복이거나 오류)");
+                }
+                closeModal(); // 모달 닫기
+
+                showPlaylistPreview(playlistId); // ✅ 오른쪽 프리뷰 열기
+            });
+        }
+
+        function createPlaylist() {
+            const name = document.getElementById("newPlaylistName").value.trim();
+            const userId = 1;
+
+            if (!name) {
+                alert("플레이리스트 이름을 입력하세요.");
+                return;
+            }
+
+            fetch(`/api/playlists?userId=${userId}&name=${encodeURIComponent(name)}`, {
+                method: 'POST'
+            }).then(res => {
+                if (res.ok) {
+                    alert("생성 완료!");
+                    document.getElementById("newPlaylistName").value = "";
+                    loadPlaylistList(); // 리스트 다시 불러오기
+                } else {
+                    alert("생성 실패");
+                }
+            });
+        }
+
+        function loadPlaylistList() {
             const userId = 1;
 
             fetch(`/api/playlists?userId=${userId}`)
@@ -43,29 +92,31 @@
                         li.appendChild(btn);
                         ul.appendChild(li);
                     });
-
-                    document.getElementById("playlistModal").style.display = "block";
                 });
         }
 
-        function closeModal() {
-            document.getElementById("playlistModal").style.display = "none";
-            selectedMusicId = null;
-        }
+        function showPlaylistPreview(playlistId) {
+            fetch(`/api/playlists/${playlistId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // ✅ 프리뷰 영역 표시
+                    document.getElementById("playlistPreviewWrapper").style.display = "block";
 
-        function addToPlaylist(playlistId) {
-            fetch(`/api/playlists/${playlistId}/music`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ musicId: selectedMusicId })
-            }).then(res => {
-                if (res.ok) {
-                    alert("플레이리스트에 추가 완료!");
-                    closeModal();
-                } else {
-                    alert("추가 실패 (중복이거나 오류)");
-                }
-            });
+                    // 제목 설정
+                    document.getElementById("previewTitle").textContent = `🎵 ${data.name}`;
+
+                    // 목록 렌더링
+                    const ul = document.getElementById("playlistPreviewList");
+                    ul.innerHTML = "";
+                    data.musics.forEach(song => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            ${song.title} - ${song.artist}
+                            <button onclick="playMusic(${song.musicId}, '${song.youtubeId}')">▶️</button>
+                        `;
+                        ul.appendChild(li);
+                    });
+                });
         }
     </script>
 
@@ -96,42 +147,63 @@
         <button>📅 일간 차트 보기</button>
     </a>
 
-    <table border="1">
-        <thead>
-        <tr>
-            <th>순위</th>
-            <th>제목</th>
-            <th>아티스트</th>
-            <th>앨범</th>
-            <th>커버</th>
-            <th>재생</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="music, stat : ${chart}">
-            <td th:text="${stat.index + 1}"></td>
-            <td th:text="${music.title}"></td>
-            <td th:text="${music.artist}"></td>
-            <td th:text="${music.album}"></td>
-            <td><img th:src="${music.coverImageUrl}" width="50"/></td>
-            <td>
-                <button
-                    th:if="${music.youtubeUrl != null}"
-                    th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
-                    >▶️ 재생</button>
-                <button
-                        th:if="${music.youtubeUrl != null}"
-                        th:attr="onclick=|openAddModal(${music.musicId})|"
-                >➕</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div style="display: flex; gap: 30px;">
+        <!-- 왼쪽: 실시간 차트 -->
+        <div style="flex: 2;">
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>제목</th>
+                    <th>아티스트</th>
+                    <th>앨범</th>
+                    <th>커버</th>
+                    <th>재생</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="music, stat : ${chart}">
+                    <td th:text="${stat.index + 1}"></td>
+                    <td th:text="${music.title}"></td>
+                    <td th:text="${music.artist}"></td>
+                    <td th:text="${music.album}"></td>
+                    <td><img th:src="${music.coverImageUrl}" width="50"/></td>
+                    <td>
+                        <button
+                                th:if="${music.youtubeUrl != null}"
+                                th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
+                        >▶️ 재생</button>
+                        <button
+                                th:if="${music.youtubeUrl != null}"
+                                th:attr="onclick=|openAddModal(${music.musicId})|"
+                        >➕</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 오른쪽: 플레이리스트 프리뷰 -->
+        <div id="playlistPreviewWrapper" style="display: none; flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
+            <h3 id="previewTitle">🎵 플레이리스트 미리보기</h3>
+            <ul id="playlistPreviewList"></ul>
+        </div>
+    </div>
+
 
     <!-- 플레이리스트 모달 -->
     <div id="playlistModal">
         <h3>플레이리스트에 추가</h3>
+
         <ul id="playlistList"></ul>
+
+        <hr>
+        <div>
+            <input type="text" id="newPlaylistName" placeholder="새 플레이리스트 이름" />
+            <button onclick="createPlaylist()">➕ 새로 만들기</button>
+        </div>
+
+        <br>
         <button onclick="closeModal()">닫기</button>
     </div>
 
