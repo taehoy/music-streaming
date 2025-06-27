@@ -5,8 +5,11 @@
     <title>Title</title>
     <script th:src="@{/js/auth.js}"></script>
     <script>
+
+        let selectedMusicId = null;
+
         function playMusic(musicId, youtubeId) {
-            const userId = 1;
+            const userId = 1; <!-- 추후 로그인 기능 구현 시 수정 필요-->
             console.log("음원재생" , musicId, youtubeId)
 
             // 재생 로그 저장
@@ -21,7 +24,66 @@
                 }
             });
         }
+
+        function openAddModal(musicId) {
+            selectedMusicId = musicId;
+            const userId = 1;
+
+            fetch(`/api/playlists?userId=${userId}`)
+                .then(res => res.json())
+                .then(playlists => {
+                    const ul = document.getElementById("playlistList");
+                    ul.innerHTML = "";
+
+                    playlists.forEach(pl => {
+                        const li = document.createElement("li");
+                        const btn = document.createElement("button");
+                        btn.textContent = pl.name;
+                        btn.onclick = () => addToPlaylist(pl.playlistId);
+                        li.appendChild(btn);
+                        ul.appendChild(li);
+                    });
+
+                    document.getElementById("playlistModal").style.display = "block";
+                });
+        }
+
+        function closeModal() {
+            document.getElementById("playlistModal").style.display = "none";
+            selectedMusicId = null;
+        }
+
+        function addToPlaylist(playlistId) {
+            fetch(`/api/playlists/${playlistId}/music`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ musicId: selectedMusicId })
+            }).then(res => {
+                if (res.ok) {
+                    alert("플레이리스트에 추가 완료!");
+                    closeModal();
+                } else {
+                    alert("추가 실패 (중복이거나 오류)");
+                }
+            });
+        }
     </script>
+
+    <style>
+        #playlistModal {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 40%;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+        }
+        #playlistModal button {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <a href="/posts">게시판</a>
@@ -57,10 +119,21 @@
                     th:if="${music.youtubeUrl != null}"
                     th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
                     >▶️ 재생</button>
+                <button
+                        th:if="${music.youtubeUrl != null}"
+                        th:attr="onclick=|openAddModal(${music.musicId})|"
+                >➕</button>
             </td>
         </tr>
         </tbody>
     </table>
+
+    <!-- 플레이리스트 모달 -->
+    <div id="playlistModal">
+        <h3>플레이리스트에 추가</h3>
+        <ul id="playlistList"></ul>
+        <button onclick="closeModal()">닫기</button>
+    </div>
 
     <hr>
     <h2>📺 현재 재생 중</h2>

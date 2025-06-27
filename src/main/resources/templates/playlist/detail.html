@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>플레이리스트 상세</title>
+    <script th:src="@{/js/auth.js}"></script>
+
+    <script>
+        async function fetchPlaylistDetail() {
+            const playlistId = /*[[${playlistId}]]*/ 0;
+
+            const res = await fetch(`/api/playlists/${playlistId}`);
+            const data = await res.json();
+
+            document.getElementById("playlistName").textContent = data.name;
+
+            const tbody = document.getElementById("musicTableBody");
+            tbody.innerHTML = "";
+
+            data.musics.forEach(song => {
+                const row = `
+                    <tr>
+                        <td>${song.title}</td>
+                        <td>${song.artist}</td>
+                        <td>${song.album}</td>
+                        <td>
+                            <button onclick="playMusic(${song.musicId}, '${song.youtubeId}')">▶️ 재생</button>
+                        </td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function playMusic(musicId, youtubeId) {
+            const userId = 1;
+
+            fetch(`/api/play?musicId=${musicId}&userId=${userId}`, {
+                method: 'POST'
+            }).then(res => {
+                if (res.ok) {
+                    const iframe = document.getElementById("player");
+                    iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+                } else {
+                    alert("재생 실패");
+                }
+            });
+        }
+
+        window.onload = function () {
+            fetchPlaylistDetail();
+            showAuthButtons();
+        };
+
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/login";
+        }
+
+        function showAuthButtons() {
+            const token = localStorage.getItem("accessToken");
+            const authDiv = document.getElementById("auth-buttons");
+
+            if (token) {
+                authDiv.innerHTML = `
+                    <a href="/me.html">내 정보</a>
+                    <button onclick="logout()">로그아웃</button>
+                `;
+            } else {
+                authDiv.innerHTML = `
+                    <a href="/login">로그인</a> |
+                    <a href="/signup">회원가입</a>
+                `;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="auth-buttons"></div>
+
+    <h1 id="playlistName">🎵 플레이리스트</h1>
+    <a href="/">🏠 홈으로</a>
+
+    <table border="1">
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>아티스트</th>
+            <th>앨범</th>
+            <th>재생</th>
+        </tr>
+        </thead>
+        <tbody id="musicTableBody"></tbody>
+    </table>
+
+    <hr>
+    <h2>📺 현재 재생 중</h2>
+    <iframe id="player" width="560" height="315" src="" frameborder="0"
+            allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</body>
+</html>

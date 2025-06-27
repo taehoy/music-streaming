@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.music.infrastructure.mybatis.mapper.PlaylistMapper">
+
+    <insert id="insertPlaylist">
+        INSERT INTO playlist (user_id, name, created_at)
+        VALUES (#{playlist.userId}, #{playlist.name}, #{playlist.createdAt})
+    </insert>
+
+    <select id="findByUserId" resultType="com.music.domain.Playlist">
+        SELECT * FROM playlist
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insertPlaylistMusic">
+        INSERT INTO playlist_music (playlist_id, music_id, sort_order)
+        VALUES (#{playlistMusic.playlistId}, #{playlistMusic.musicId}, #{playlistMusic.sortOrder})
+    </insert>
+
+    <select id="findMaxSortOrder" resultType="int">
+        SELECT COALESCE(MAX(sort_order), 0)
+        FROM playlist_music
+        WHERE playlist_id = #{playlistId}
+    </select>
+
+    <select id="findPlaylistById" resultType="com.music.domain.Playlist">
+        SELECT * FROM playlist WHERE id = #{playlistId}
+    </select>
+
+    <select id="findMusicsByPlaylistId" resultType="com.music.domain.Music">
+        SELECT m.*
+        FROM playlist_music pm
+                 JOIN music m ON pm.music_id = m.id
+        WHERE pm.playlist_id = #{playlistId}
+        ORDER BY pm.sort_order ASC
+    </select>
+
+</mapper>
