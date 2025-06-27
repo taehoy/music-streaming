@@ -13,4 +13,6 @@ public interface PlaylistRepository {
 
     Playlist findById(Long playlistId);
     List<Music> findMusicsInPlaylist(Long playlistId);
+    void removeMusicFromPlaylist(Long playlistId, Long musicId);
+
 }

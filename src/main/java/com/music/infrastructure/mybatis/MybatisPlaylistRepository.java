@@ -44,4 +44,9 @@ public class MybatisPlaylistRepository implements PlaylistRepository {
     public List<Music> findMusicsInPlaylist(Long playlistId) {
         return playlistMapper.findMusicsByPlaylistId(playlistId);
     }
+
+    @Override
+    public void removeMusicFromPlaylist(Long playlistId, Long musicId) {
+        playlistMapper.deletePlaylistMusic(playlistId, musicId);
+    }
 }

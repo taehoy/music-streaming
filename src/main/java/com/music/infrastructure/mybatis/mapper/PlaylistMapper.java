@@ -20,4 +20,6 @@ public interface PlaylistMapper {
     Playlist findPlaylistById(@Param("playlistId") Long playlistId);
 
     List<Music> findMusicsByPlaylistId(@Param("playlistId") Long playlistId);
+    void deletePlaylistMusic(@Param("playlistId") Long playlistId, @Param("musicId") Long musicId);
+
 }

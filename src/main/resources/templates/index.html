@@ -108,15 +108,32 @@
                     // 목록 렌더링
                     const ul = document.getElementById("playlistPreviewList");
                     ul.innerHTML = "";
+
                     data.musics.forEach(song => {
                         const li = document.createElement("li");
                         li.innerHTML = `
                             ${song.title} - ${song.artist}
                             <button onclick="playMusic(${song.musicId}, '${song.youtubeId}')">▶️</button>
+                            <button onclick="deleteFromPlaylist(${playlistId}, ${song.musicId})">🗑️</button>
                         `;
                         ul.appendChild(li);
                     });
                 });
+        }
+
+        function deleteFromPlaylist(playlistId, musicId) {
+            if (!confirm("이 곡을 플레이리스트에서 삭제할까요?")) return;
+
+            fetch(`/api/playlists/${playlistId}/music/${musicId}`, {
+                method: 'DELETE'
+            }).then(res => {
+                if (res.ok) {
+                    alert("삭제 완료!");
+                    showPlaylistPreview(playlistId); // 삭제 후 프리뷰 갱신
+                } else {
+                    alert("삭제 실패");
+                }
+            });
         }
     </script>
 

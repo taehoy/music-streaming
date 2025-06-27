@@ -39,4 +39,11 @@
         ORDER BY pm.sort_order ASC
     </select>
 
+    <delete id="deletePlaylistMusic">
+        DELETE FROM playlist_music
+        WHERE playlist_id = #{playlistId}
+          AND music_id = #{musicId}
+    </delete>
+
+
 </mapper>

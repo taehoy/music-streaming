@@ -61,4 +61,7 @@ public class PlaylistService {
         return url.substring(url.indexOf("/embed/") + 7);
     }
 
+    public void removeMusicFromPlaylist(Long playlistId, Long musicId) {
+        playlistRepository.removeMusicFromPlaylist(playlistId, musicId);
+    }
 }

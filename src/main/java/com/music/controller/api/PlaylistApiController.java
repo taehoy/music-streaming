@@ -43,4 +43,10 @@ public class PlaylistApiController {
         return ResponseEntity.ok(detail);
     }
 
+    @DeleteMapping("/{playlistId}/music/{musicId}")
+    public ResponseEntity<Void> removeMusicFromPlaylist(@PathVariable Long playlistId, @PathVariable Long musicId) {
+        playlistService.removeMusicFromPlaylist(playlistId, musicId);
+        return ResponseEntity.ok().build();
+    }
+
 }
