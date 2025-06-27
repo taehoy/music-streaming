@@ -135,6 +135,10 @@
                 }
             });
         }
+
+        function closePlaylistPreview() {
+            document.getElementById("playlistPreviewWrapper").style.display = "none";
+        }
     </script>
 
     <style>
@@ -202,7 +206,10 @@
 
         <!-- 오른쪽: 플레이리스트 프리뷰 -->
         <div id="playlistPreviewWrapper" style="display: none; flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
-            <h3 id="previewTitle">🎵 플레이리스트 미리보기</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="previewTitle">🎵 플레이리스트 미리보기</h3>
+                <button onclick="closePlaylistPreview()" style="font-size: 16px;">❌</button>
+            </div>
             <ul id="playlistPreviewList"></ul>
         </div>
     </div>
