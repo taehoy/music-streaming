@@ -39,7 +39,13 @@ public class ChartApiController {
 
         log.info("❗api/chart/daily 호출, date = {}", date);
 
-        return ResponseEntity.ok(dailyChartService.getDailyChartByDate(date));
+        List<DailyChartResponse> result = dailyChartService.getDailyChartByDate(date);
+
+        for (DailyChartResponse dailyChartResponse : result) {
+            log.info("❗api/chart/daily 호출, title ={}, youtube_url = {}", dailyChartResponse.getTitle(), dailyChartResponse.getYoutubeUrl());
+        }
+
+        return ResponseEntity.ok(result);
     }
 
 }

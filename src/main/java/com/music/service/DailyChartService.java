@@ -6,6 +6,7 @@ import com.music.domain.Music;
 import com.music.domain.response.DailyChartResponse;
 import com.music.repository.DailyChartRepository;
 import com.music.repository.MusicRepository;
+import com.music.util.YoutubeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,9 +33,11 @@ public class DailyChartService {
                             .title(music.get().getTitle())
                             .artist(music.get().getArtist())
                             .playCount(chart.getPlayCount())
-                            .youtubeUrl(music.get().getYoutubeUrl())
+                            .youtubeUrl(YoutubeUtils.extractYoutubeId(music.get().getYoutubeUrl()))
                             .build();
                 })
                 .collect(Collectors.toList());
     }
+
+
 }

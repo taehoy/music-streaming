@@ -26,22 +26,27 @@
                     <td>${song.artist}</td>
                     <td>${song.playCount}</td>
                     <td>
-                        <button
-                            th:if="${song.youtubeUrl != null}"
-                            th:attr="onclick=|playMusic(${song.musicId}, '${song.youtubeUrl}')|"
-                        >▶️</button>
+                      <button onclick="playMusic(${song.musicId}, '${song.youtubeUrl}')">▶️ 재생</button>
                     </td>
                 </tr>`;
           tbody.innerHTML += row;
         });
+      }
 
-        function playMusic(musicId) {
-          fetch('/api/play', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({musicId})
-          });
-        }
+      function playMusic(musicId, youtubeId) {
+        const userId = 1;
+        console.log("음원재생", musicId, youtubeId);
+
+        fetch(`/api/play?musicId=${musicId}&userId=${userId}`, {
+          method: 'POST'
+        }).then(response => {
+          if (response.ok) {
+            const iframe = document.getElementById("player");
+            iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+          } else {
+            alert("재생 실패");
+          }
+        });
       }
 
       window.onload = function () {
@@ -70,6 +75,10 @@
     <tbody id="chartBody"></tbody>
   </table>
 
-  <div id="player" style="margin-top: 30px;"></div>
+  <hr>
+  <h2>📺 현재 재생 중</h2>
+  <iframe id="player" width="560" height="315" src="" frameborder="0"
+          allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 </body>
 </html>
