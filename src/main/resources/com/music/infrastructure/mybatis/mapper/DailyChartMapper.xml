@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.music.infrastructure.mybatis.mapper.DailyChartMapper">
+    <insert id="insertBatch">
+        INSERT INTO daily_chart (music_id, chart_rank, play_count, chart_date, created_at)
+        VALUES
+        <foreach collection="charts" item="chart" separator=",">
+            (#{chart.musicId}, #{chart.chartRank}, #{chart.playCount}, #{chart.chartDate}, #{chart.createdAt})
+        </foreach>
+    </insert>
+</mapper>
