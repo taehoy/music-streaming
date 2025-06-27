@@ -11,4 +11,10 @@
             (#{chart.musicId}, #{chart.chartRank}, #{chart.playCount}, #{chart.chartDate}, #{chart.createdAt})
         </foreach>
     </insert>
+
+    <select id="findByChartDate" resultType="com.music.domain.DailyChart">
+        SELECT music_id, chart_rank, play_count, chart_date, created_at FROM daily_chart
+        WHERE chart_date = #{date}
+        ORDER BY chart_rank ASC
+    </select>
 </mapper>

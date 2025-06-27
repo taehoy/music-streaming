@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>일간차트</title>
+    <script>
+      function getYesterdayDateString() {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.toISOString().slice(0, 10); // yyyy-MM-dd
+      }
+      async function fetchChart() {
+        const date = document.getElementById("chartDate").value;
+        if(!date) return;
+
+        const response = await fetch(`/api/chart/daily?date=${date}`);
+        const data = await response.json();
+
+        const tbody = document.getElementById("chartBody");
+        tbody.innerHTML = "";
+
+        data.forEach(song => {
+          const row = `<tr>
+                    <td>${song.chartRank}</td>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${song.playCount}</td>
+                    <td>
+                        <button
+                            th:if="${song.youtubeUrl != null}"
+                            th:attr="onclick=|playMusic(${song.musicId}, '${song.youtubeUrl}')|"
+                        >▶️</button>
+                    </td>
+                </tr>`;
+          tbody.innerHTML += row;
+        });
+
+        function playMusic(musicId) {
+          fetch('/api/play', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({musicId})
+          });
+        }
+      }
+
+      window.onload = function () {
+        const dateInput = document.getElementById("chartDate");
+        const yesterdayStr = getYesterdayDateString();
+        dateInput.value = yesterdayStr;
+        fetchChart();
+      };
+    </script>
+</head>
+<body>
+  <h1>일간 차트</h1>
+  <input type="date" id="chartDate"/>
+  <button onclick="fetchChart()">조회</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>순위</th>
+        <th>제목</th>
+        <th>아티스트</th>
+        <th>재생수</th>
+        <th>재생</th>
+      </tr>
+    </thead>
+    <tbody id="chartBody"></tbody>
+  </table>
+
+  <div id="player" style="margin-top: 30px;"></div>
+</body>
+</html>

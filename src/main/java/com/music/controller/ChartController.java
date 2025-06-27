@@ -1,23 +1,30 @@
 package com.music.controller;
 
-import com.music.domain.response.RealtimeChartResponse;
-import com.music.service.ChartService;
+import com.music.domain.response.DailyChartResponse;
+import com.music.service.DailyChartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/chart")
+@Slf4j
+@Controller
+@RequestMapping("/chart")
 @RequiredArgsConstructor
 public class ChartController {
-    private final ChartService chartService;
 
-    @GetMapping("/realtime")
-    public List<RealtimeChartResponse> getRealtimeChart(@RequestParam(defaultValue = "10") int size) {
-        return chartService.getRealtimeChart(size);
+    @GetMapping("/daily")
+    public String dailyChart(
+            @RequestParam(value = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        log.info("/chart/daily 페이지 열림, 선택적 date 파라미터 = {}" , date);
+        return "chart/daily";
     }
 }

@@ -6,6 +6,7 @@ import com.music.repository.DailyChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,11 @@ public class MybatisDailyChartRepository implements DailyChartRepository {
 
         dailyChartMapper.insertBatch(charts);
     }
+
+    @Override
+    public List<DailyChart> findByChartDate(LocalDate date) {
+        return dailyChartMapper.findByChartDate(date);
+    }
+
+
 }
