@@ -3,6 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>일간차트</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    #sideNav {
+      width: 120px;
+      background-color: #f4f4f4;
+      border-right: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      gap: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #sideNav button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #sideNav button:hover {
+      font-weight: bold;
+      color: dodgerblue;
+    }
+
+    #mainContent {
+      margin-left: 120px;
+      padding: 20px;
+    }
+  </style>
     <script>
       function getYesterdayDateString() {
         const d = new Date();
@@ -69,14 +107,27 @@
         fetchChart();
       };
     </script>
+
+
 </head>
 <body>
-  <h1>일간 차트</h1>
-  <input type="date" id="chartDate"/>
-  <button onclick="fetchChart()">조회</button>
+<div style="display: flex; min-height: 100vh;">
+  <!-- ✅ 왼쪽 고정 네비게이션 -->
+  <nav id="sideNav">
+    <button onclick="location.href='/'">🏠 홈</button>
+    <button onclick="location.href='/me/playlists'">📋 마이페이지</button>
+    <button onclick="location.href='/chart/daily'">📅 일간차트</button>
+  </nav>
 
-  <table>
-    <thead>
+  <!-- ✅ 오른쪽 메인 콘텐츠 -->
+  <main id="mainContent">
+    <h1>📅 일간 차트</h1>
+
+    <input type="date" id="chartDate" />
+    <button onclick="fetchChart()">조회</button>
+
+    <table border="1" style="margin-top: 10px;">
+      <thead>
       <tr>
         <th>순위</th>
         <th>제목</th>
@@ -84,14 +135,15 @@
         <th>재생수</th>
         <th>재생</th>
       </tr>
-    </thead>
-    <tbody id="chartBody"></tbody>
-  </table>
+      </thead>
+      <tbody id="chartBody"></tbody>
+    </table>
 
-  <hr>
-  <h2>📺 현재 재생 중</h2>
-  <iframe id="player" width="560" height="315" src="" frameborder="0"
-          allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
+    <hr>
+    <h2>📺 현재 재생 중</h2>
+    <iframe id="player" width="560" height="315" src="" frameborder="0"
+            allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </main>
+</div>
 </body>
 </html>
