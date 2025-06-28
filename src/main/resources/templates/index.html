@@ -155,87 +155,135 @@
         #playlistModal button {
             margin: 5px 0;
         }
+
+        #sideNav {
+            width: 120px;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #sideNav button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #sideNav button:hover {
+            font-weight: bold;
+            color: dodgerblue;
+        }
+
+        #mainContent {
+            margin-left: 120px;
+            padding: 20px;
+            flex: 1;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-    <a href="/posts">게시판</a>
+<div style="display: flex; min-height: 100vh;">
+    <!-- ✅ 왼쪽 사이드바 -->
+    <nav id="sideNav">
+        <button onclick="location.href='/'">🏠 홈</button>
+        <button onclick="location.href='/me/playlists'">📋 마이페이지</button>
+        <button onclick="location.href='/chart/daily'">📅 일간차트</button>
+    </nav>
 
-    <div id="auth-buttons"></div>
+    <!-- ✅ 오른쪽 본문 영역 -->
+    <main id="mainContent">
+        <!-- 기존 내용 여기에 위치 -->
+        <a href="/posts">게시판</a>
 
-    <h1>실시간 차트</h1>
+        <div id="auth-buttons"></div>
 
-    <a href="/chart/daily">
-        <button>📅 일간 차트 보기</button>
-    </a>
+        <h1>실시간 차트</h1>
 
-    <div style="display: flex; gap: 30px;">
-        <!-- 왼쪽: 실시간 차트 -->
-        <div style="flex: 2;">
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>순위</th>
-                    <th>제목</th>
-                    <th>아티스트</th>
-                    <th>앨범</th>
-                    <th>커버</th>
-                    <th>재생</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="music, stat : ${chart}">
-                    <td th:text="${stat.index + 1}"></td>
-                    <td th:text="${music.title}"></td>
-                    <td th:text="${music.artist}"></td>
-                    <td th:text="${music.album}"></td>
-                    <td><img th:src="${music.coverImageUrl}" width="50"/></td>
-                    <td>
-                        <button
-                                th:if="${music.youtubeUrl != null}"
-                                th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
-                        >▶️ 재생</button>
-                        <button
-                                th:if="${music.youtubeUrl != null}"
-                                th:attr="onclick=|openAddModal(${music.musicId})|"
-                        >➕</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <a href="/chart/daily">
+            <button>📅 일간 차트 보기</button>
+        </a>
 
-        <!-- 오른쪽: 플레이리스트 프리뷰 -->
-        <div id="playlistPreviewWrapper" style="display: none; flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="previewTitle">🎵 플레이리스트 미리보기</h3>
-                <button onclick="closePlaylistPreview()" style="font-size: 16px;">❌</button>
+        <div style="display: flex; gap: 30px;">
+            <!-- 왼쪽: 실시간 차트 -->
+            <div style="flex: 2;">
+                <table border="1">
+                    <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>제목</th>
+                        <th>아티스트</th>
+                        <th>앨범</th>
+                        <th>커버</th>
+                        <th>재생</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="music, stat : ${chart}">
+                        <td th:text="${stat.index + 1}"></td>
+                        <td th:text="${music.title}"></td>
+                        <td th:text="${music.artist}"></td>
+                        <td th:text="${music.album}"></td>
+                        <td><img th:src="${music.coverImageUrl}" width="50"/></td>
+                        <td>
+                            <button
+                                    th:if="${music.youtubeUrl != null}"
+                                    th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
+                            >▶️ 재생</button>
+                            <button
+                                    th:if="${music.youtubeUrl != null}"
+                                    th:attr="onclick=|openAddModal(${music.musicId})|"
+                            >➕</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-            <ul id="playlistPreviewList"></ul>
+
+            <!-- 오른쪽: 플레이리스트 프리뷰 -->
+            <div id="playlistPreviewWrapper" style="display: none; flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="previewTitle">🎵 플레이리스트 미리보기</h3>
+                    <button onclick="closePlaylistPreview()" style="font-size: 16px;">❌</button>
+                </div>
+                <ul id="playlistPreviewList"></ul>
+            </div>
         </div>
-    </div>
 
 
-    <!-- 플레이리스트 모달 -->
-    <div id="playlistModal">
-        <h3>플레이리스트에 추가</h3>
+        <!-- 플레이리스트 모달 -->
+        <div id="playlistModal">
+            <h3>플레이리스트에 추가</h3>
 
-        <ul id="playlistList"></ul>
+            <ul id="playlistList"></ul>
+
+            <hr>
+            <div>
+                <input type="text" id="newPlaylistName" placeholder="새 플레이리스트 이름" />
+                <button onclick="createPlaylist()">➕ 새로 만들기</button>
+            </div>
+
+            <br>
+            <button onclick="closeModal()">닫기</button>
+        </div>
 
         <hr>
-        <div>
-            <input type="text" id="newPlaylistName" placeholder="새 플레이리스트 이름" />
-            <button onclick="createPlaylist()">➕ 새로 만들기</button>
-        </div>
-
-        <br>
-        <button onclick="closeModal()">닫기</button>
-    </div>
-
-    <hr>
-    <h2>📺 현재 재생 중</h2>
-    <iframe id="player" width="560" height="315" src="" frameborder="0"
-            allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
+        <h2>📺 현재 재생 중</h2>
+        <iframe id="player" width="560" height="315" src="" frameborder="0"
+                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </main>
+</div>
     <script>
         function logout() {
             localStorage.removeItem("accessToken");
