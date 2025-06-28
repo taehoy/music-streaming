@@ -3,6 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>내 플레이리스트</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #sideNav {
+            width: 120px;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #sideNav button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #sideNav button:hover {
+            font-weight: bold;
+            color: dodgerblue;
+        }
+
+        #mainContent {
+            margin-left: 120px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .playlist-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+
     <script>
       async function fetchMyPlaylists() {
         const userId = /*[[${userId}]]*/ 1;
@@ -32,10 +78,22 @@
 
       window.onload = fetchMyPlaylists;
     </script>
+
 </head>
 <body>
-    <h1>🎵 나의 플레이리스트 목록</h1>
-    <a href="/">🏠 홈으로</a>
-    <div id="playlistContainer"></div>
+    <div style="display: flex; min-height: 100vh;">
+        <!-- ✅ 고정 네비게이션 -->
+        <nav id="sideNav">
+            <button onclick="location.href='/'">🏠 홈</button>
+            <button onclick="location.href='/me/playlists'">📋 마이페이지</button>
+            <button onclick="location.href='/chart/daily'">📅 일간차트</button>
+        </nav>
+
+        <!-- ✅ 본문 영역 -->
+        <main id="mainContent">
+            <h1>📋 나의 플레이리스트</h1>
+            <div id="playlistContainer"></div>
+        </main>
+    </div>
 </body>
 </html>
