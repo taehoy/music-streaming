@@ -4,9 +4,34 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script th:src="@{/js/auth.js}"></script>
-    <script>
 
+    <script>
         let selectedMusicId = null;
+
+        let nowPlayingIndex = -1;
+        const queue = [];
+        let isPlayerReady = false;
+        let youtubePlayer;
+        function onYouTubeIframeAPIReady() {
+            console.log(" 유튜브 API 준비됨")
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '315',
+                width: '560',
+                videoId: '',
+                events: {
+                    'onReady': () => {
+                        isPlayerReady = true;
+                    },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                playNextFromQueue();
+            }
+        }
 
         function playMusic(musicId, youtubeId, title = null, artist = null) {
             const userId = 1; <!-- 추후 로그인 기능 구현 시 수정 필요-->
@@ -17,22 +42,60 @@
                 method: 'POST'
             }).then(response => {
                 if (response.ok) {
-                    const iframe = document.getElementById("player");
-                    // ✅ 자동 재생을 위해 먼저 비우고 다시 설정
-                    iframe.src = "";
-                    setTimeout(() => {
-                        iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=0`;
-                    }, 50);
+                    if (isPlayerReady && youtubePlayer && typeof youtubePlayer.loadVideoById === 'function') {
+                        youtubePlayer.loadVideoById(youtubeId);
+                    } else {
+                        alert("유튜브 플레이어가 아직 준비되지 않았습니다.");
+                    }
 
-                    // 재생목록 추가
+                    // // // 재생목록 추가
+                    // if (title && artist) {
+                    //     addToRealtimeQueue(musicId, title, artist, youtubeId);
+                    //     nowPlayingIndex = document.querySelectorAll('#realtimeQueue li').length - 1;
+                    // }
+
                     if (title && artist) {
-                        addToRealtimeQueue(musicId, title, artist, youtubeId);
+                        // ✅ 이미 있는 곡인지 검사
+                        const existingIndex = queue.findIndex(q => q.musicId === musicId);
+                        if (existingIndex === -1) {
+                            queue.push({ musicId, title, artist, youtubeId });
+                            nowPlayingIndex = queue.length - 1;
+                        } else {
+                            nowPlayingIndex = existingIndex;
+                        }
+
+                        updateRealtimeQueueUI();
                     }
                 } else {
                     alert("재생 실패");
                 }
             });
         }
+
+        function playNextFromQueue() {
+            if (nowPlayingIndex + 1 >= queue.length) {
+                console.log("🎵 재생 목록이 끝났습니다.");
+                return;
+            }
+            nowPlayingIndex++;
+            const next = queue[nowPlayingIndex];
+            playMusic(next.musicId, next.youtubeId, next.title, next.artist);
+        }
+
+        function updateRealtimeQueueUI() {
+            const list = document.getElementById("realtimeQueue");
+            list.innerHTML = '';
+            queue.forEach((item, idx) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                ${item.title} - ${item.artist}
+                <button onclick="playMusic(${item.musicId}, '${item.youtubeId}', '${item.title}', '${item.artist}')">▶️</button>
+                <button onclick="removeFromRealtimeQueue(${idx})">🗑️</button>
+            `;
+                list.appendChild(li);
+            });
+        }
+
 
         function openAddModal(musicId) {
             selectedMusicId = musicId;
@@ -195,9 +258,10 @@
             queue.appendChild(li);
         }
 
-        function removeFromRealtimeQueue(button) {
-            const li = button.parentElement;
-            li.remove();
+        function removeFromRealtimeQueue(index) {
+            queue.splice(index, 1);
+            if (nowPlayingIndex >= index) nowPlayingIndex--;
+            updateRealtimeQueueUI();
         }
     </script>
 
@@ -389,10 +453,15 @@
 
         <hr>
         <h2>📺 현재 재생 중</h2>
-        <iframe id="player" width="560" height="315" src="" frameborder="0"
-                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div id="playerContainer">
+            <div id="youtubePlayer"></div>
+        </div>
+<!--        <iframe id="player" width="560" height="315" src="" frameborder="0"-->
+<!--                allow="autoplay; encrypted-media" allowfullscreen></iframe>-->
     </main>
 </div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+
     <script>
         function logout() {
             localStorage.removeItem("accessToken");
