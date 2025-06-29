@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>음원 검색</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            display: flex;
+        }
+
+        /* 왼쪽 사이드바 */
+        #sideNav {
+            width: 160px;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        #sideNav button,
+        #sideNav input {
+            width: 100%;
+            font-size: 14px;
+            padding: 8px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+
+        #sideNav input[type="text"] {
+            border: 1px solid #ccc;
+        }
+
+        /* 오른쪽 본문 */
+        #mainContent {
+            margin-left: 160px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        img {
+            border-radius: 4px;
+        }
+    </style>
+
+    <script>
+        let selectedMusicId = null;
+
+        function searchMusic() {
+            const keyword = document.getElementById("keywordInput").value.trim();
+            if (!keyword) return;
+
+            fetch(`/api/music/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(res => res.json())
+                .then(musicList => {
+                    const tbody = document.getElementById("resultsBody");
+                    tbody.innerHTML = "";
+
+                    if (musicList.length === 0) {
+                        document.getElementById("resultsTable").style.display = "none";
+                        alert("검색 결과가 없습니다.");
+                        return;
+                    }
+
+                    document.getElementById("resultsTable").style.display = "table";
+
+                    musicList.forEach(music => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                              <td>${music.title}</td>
+                              <td>${music.artist}</td>
+                              <td>${music.album}</td>
+                              <td><img src="${music.coverImageUrl}" width="50"/></td>
+                              <td><button onclick="playMusic(${music.musicId}, '${music.youtubeUrl}')">▶️</button></td>
+                              <td><button onclick="addToPlaylist(${music.musicId})">➕</button></td>
+                            `;
+                        tbody.appendChild(row);
+                    });
+                });
+        }
+
+        function playMusic(musicId, youtubeUrl) {
+            const userId = 1; // 로그인 구현 전까지는 고정
+            fetch(`/api/play?musicId=${musicId}&userId=${userId}`, { method: 'POST' })
+                .then(res => {
+                    if (res.ok) {
+                        document.getElementById("player").src = `https://www.youtube.com/embed/${youtubeUrl}?autoplay=1`;
+                    } else {
+                        alert("재생 실패");
+                    }
+                });
+        }
+
+        function addToPlaylist(musicId) {
+            const playlistId = prompt("추가할 플레이리스트 ID를 입력하세요:");
+            if (!playlistId) return;
+
+            fetch(`/api/playlists/${playlistId}/music`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ musicId })
+            }).then(res => {
+                alert(res.ok ? "추가 완료!" : "추가 실패 (중복 또는 오류)");
+            });
+        }
+    </script>
+</head>
+<body>
+<!-- ✅ 왼쪽 네비게이션 바 -->
+<nav id="sideNav">
+    <form id="searchForm" onsubmit="event.preventDefault(); searchMusic();">
+        <input type="text" id="keywordInput" placeholder="🔍 검색어 입력">
+        <button type="submit">검색</button>
+    </form>
+
+    <button onclick="location.href='/'">🏠 홈</button>
+    <button onclick="location.href='/me/playlists'">📋 마이페이지</button>
+    <button onclick="location.href='/chart/daily'">📅 일간차트</button>
+</nav>
+
+<!-- ✅ 오른쪽 본문 -->
+<main id="mainContent">
+    <h1>🔍 검색 결과</h1>
+
+    <table id="resultsTable" style="display: none;">
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>아티스트</th>
+            <th>앨범</th>
+            <th>커버</th>
+            <th>재생</th>
+            <th>추가</th>
+        </tr>
+        </thead>
+        <tbody id="resultsBody">
+        <!-- JS가 채움 -->
+        </tbody>
+    </table>
+
+    <h2>📺 현재 재생 중</h2>
+    <iframe id="player" width="560" height="315" src="" frameborder="0"
+            allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</main>
+</body>
+</html>

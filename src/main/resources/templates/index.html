@@ -139,6 +139,39 @@
         function closePlaylistPreview() {
             document.getElementById("playlistPreviewWrapper").style.display = "none";
         }
+
+        function searchMusic() {
+            const keyword = document.getElementById("keywordInput").value.trim();
+            if (!keyword) return;
+
+            fetch(`/api/music/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(res => res.json())
+                .then(musicList => {
+                    const tbody = document.getElementById("searchResultsBody");
+                    tbody.innerHTML = "";
+
+                    if (musicList.length === 0) {
+                        document.getElementById("searchResultsTable").style.display = "none";
+                        alert("검색 결과가 없습니다.");
+                        return;
+                    }
+
+                    document.getElementById("searchResultsTable").style.display = "table";
+
+                    musicList.forEach(music => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                  <td>${music.title}</td>
+                  <td>${music.artist}</td>
+                  <td>${music.album}</td>
+                  <td><img src="${music.coverImageUrl}" width="50"/></td>
+                  <td><button onclick="playMusic(${music.musicId}, '${music.youtubeUrl}')">▶️</button></td>
+                  <td><button onclick="openAddModal(${music.musicId})">➕</button></td>
+              `;
+                        tbody.appendChild(row);
+                    });
+                });
+        }
     </script>
 
     <style>
@@ -156,40 +189,61 @@
             margin: 5px 0;
         }
 
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            display: flex;
+        }
+
+        /* 왼쪽 사이드바 */
         #sideNav {
-            width: 120px;
+            width: 160px;
             background-color: #f4f4f4;
             border-right: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: fixed;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
             gap: 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
 
-        #sideNav button {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        #sideNav button:hover {
-            font-weight: bold;
-            color: dodgerblue;
-        }
-
-        #mainContent {
-            margin-left: 120px;
-            padding: 20px;
-            flex: 1;
+        #sideNav button,
+        #sideNav input {
             width: 100%;
+            font-size: 14px;
+            padding: 8px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+
+        #sideNav input[type="text"] {
+            border: 1px solid #ccc;
+        }
+
+        /* 오른쪽 본문 */
+        #mainContent {
+            margin-left: 160px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        img {
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -197,6 +251,10 @@
 <div style="display: flex; min-height: 100vh;">
     <!-- ✅ 왼쪽 사이드바 -->
     <nav id="sideNav">
+        <form id="searchForm" onsubmit="event.preventDefault(); searchMusic();">
+            <input type="text" id="keywordInput" placeholder="🔍 검색어 입력">
+            <button type="submit">검색</button>
+        </form>
         <button onclick="location.href='/'">🏠 홈</button>
         <button onclick="location.href='/me/playlists'">📋 마이페이지</button>
         <button onclick="location.href='/chart/daily'">📅 일간차트</button>
@@ -204,6 +262,24 @@
 
     <!-- ✅ 오른쪽 본문 영역 -->
     <main id="mainContent">
+
+        <!-- 🔍 검색 결과 테이블 -->
+        <h2>🔍 검색 결과</h2>
+        <table id="searchResultsTable" style="display: none;">
+            <thead>
+            <tr>
+                <th>제목</th>
+                <th>아티스트</th>
+                <th>앨범</th>
+                <th>커버</th>
+                <th>재생</th>
+                <th>추가</th>
+            </tr>
+            </thead>
+            <tbody id="searchResultsBody">
+            <!-- JS로 채워짐 -->
+            </tbody>
+        </table>
         <!-- 기존 내용 여기에 위치 -->
         <a href="/posts">게시판</a>
 

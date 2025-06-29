@@ -28,4 +28,9 @@ public class MybatisMusicRepository implements MusicRepository {
     public List<Music> findAll() {
         return musicMapper.findAll();
     }
+
+    @Override
+    public List<Music> findByKeyword(String keyword) {
+        return musicMapper.findByKeyword(keyword);
+    }
 }

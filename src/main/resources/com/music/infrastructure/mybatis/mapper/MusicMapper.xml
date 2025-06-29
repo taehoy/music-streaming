@@ -29,4 +29,11 @@
         SELECT * FROM music ORDER BY created_at DESC
     </select>
 
+    <select id="findByKeyword" resultType="com.music.domain.Music">
+        SELECT * FROM music
+        WHERE title LIKE CONCAT('%', #{keyword}, '%')
+           OR artist LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+
 </mapper>
