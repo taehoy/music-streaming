@@ -8,7 +8,7 @@
 
         let selectedMusicId = null;
 
-        function playMusic(musicId, youtubeId) {
+        function playMusic(musicId, youtubeId, title = null, artist = null) {
             const userId = 1; <!-- 추후 로그인 기능 구현 시 수정 필요-->
             console.log("음원재생" , musicId, youtubeId)
 
@@ -19,6 +19,10 @@
                 if (response.ok) {
                     const iframe = document.getElementById("player");
                     iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
+
+                    if (title && artist) {
+                        addToRealtimeQueue(musicId, title, artist, youtubeId);
+                    }
                 } else {
                     alert("재생 실패");
                 }
@@ -165,12 +169,30 @@
                   <td>${music.artist}</td>
                   <td>${music.album}</td>
                   <td><img src="${music.coverImageUrl}" width="50"/></td>
-                  <td><button onclick="playMusic(${music.musicId}, '${music.youtubeUrl}')">▶️</button></td>
+                  <td><button onclick="playMusic(${music.musicId}, '${music.youtubeUrl}', '${music.title}', '${music.artist}')">▶️</button></td>
                   <td><button onclick="openAddModal(${music.musicId})">➕</button></td>
               `;
                         tbody.appendChild(row);
                     });
                 });
+        }
+
+        function addToRealtimeQueue(musicId, title, artist, youtubeId) {
+            const queue = document.getElementById("realtimeQueue");
+
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                ${title} - ${artist}
+                <button onclick="playMusic(${musicId}, '${youtubeId}', '${title}', '${artist}')">▶️</button>
+                <button onclick="removeFromRealtimeQueue(this)">🗑️</button>
+            `;
+            queue.appendChild(li);
+        }
+
+        function removeFromRealtimeQueue(button) {
+            const li = button.parentElement;
+            li.remove();
         }
     </script>
 
@@ -315,7 +337,7 @@
                         <td>
                             <button
                                     th:if="${music.youtubeUrl != null}"
-                                    th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}')|"
+                                    th:attr="onclick=|playMusic(${music.musicId}, '${music.youtubeUrl}', '${music.title}', '${music.artist}')|"
                             >▶️ 재생</button>
                             <button
                                     th:if="${music.youtubeUrl != null}"
@@ -334,6 +356,12 @@
                     <button onclick="closePlaylistPreview()" style="font-size: 16px;">❌</button>
                 </div>
                 <ul id="playlistPreviewList"></ul>
+            </div>
+
+            <!-- ✅ 오른쪽: 실시간 재생 목록 -->
+            <div id="realtimeQueueWrapper" style="display: block; flex: 1; border-left: 1px solid #ccc; padding-left: 20px;">
+                <h3>🎧 실시간 재생 목록</h3>
+                <ul id="realtimeQueue"></ul>
             </div>
         </div>
 
