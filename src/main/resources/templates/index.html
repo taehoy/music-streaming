@@ -18,8 +18,13 @@
             }).then(response => {
                 if (response.ok) {
                     const iframe = document.getElementById("player");
-                    iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
+                    // ✅ 자동 재생을 위해 먼저 비우고 다시 설정
+                    iframe.src = "";
+                    setTimeout(() => {
+                        iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=0`;
+                    }, 50);
 
+                    // 재생목록 추가
                     if (title && artist) {
                         addToRealtimeQueue(musicId, title, artist, youtubeId);
                     }
