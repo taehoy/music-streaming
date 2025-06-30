@@ -85,10 +85,18 @@
         function updateRealtimeQueueUI() {
             const list = document.getElementById("realtimeQueue");
             list.innerHTML = '';
+
+
             queue.forEach((item, idx) => {
                 const li = document.createElement("li");
+
+                const isNowPlaying = idx === nowPlayingIndex;
+
                 li.innerHTML = `
-                ${item.title} - ${item.artist}
+                    ${isNowPlaying ? '🎵 ' : ''}
+                    <span style="${isNowPlaying ? 'font-weight:bold; color:blue;' : ''}">
+                    ${item.title} - ${item.artist}
+                  </span>
                 <button onclick="playMusic(${item.musicId}, '${item.youtubeId}', '${item.title}', '${item.artist}')">▶️</button>
                 <button onclick="removeFromRealtimeQueue(${idx})">🗑️</button>
             `;
