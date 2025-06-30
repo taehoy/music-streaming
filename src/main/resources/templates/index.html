@@ -185,7 +185,7 @@
                         const li = document.createElement("li");
                         li.innerHTML = `
                             ${song.title} - ${song.artist}
-                            <button onclick="playMusic(${song.musicId}, '${song.youtubeId}')">▶️</button>
+                            <button onclick="playMusic(${song.musicId}, '${song.youtubeId}', '${song.title}', '${song.artist}')">▶️</button>
                             <button onclick="deleteFromPlaylist(${playlistId}, ${song.musicId})">🗑️</button>
                         `;
                         ul.appendChild(li);
