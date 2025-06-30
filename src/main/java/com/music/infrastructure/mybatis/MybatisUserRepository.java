@@ -33,4 +33,9 @@ public class MybatisUserRepository implements UserRepository {
     public Optional<User> findByUuid(String uuid) {
         return Optional.ofNullable(userMapper.findByUuid(uuid));
     }
+
+    @Override
+    public int existsByLoginId(String loginId) {
+        return userMapper.existsByLoginId(loginId);
+    }
 }

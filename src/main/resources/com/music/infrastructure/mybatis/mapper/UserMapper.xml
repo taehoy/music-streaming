@@ -27,8 +27,14 @@
         SELECT * FROM user WHERE login_id = #{loginId}
     </select>
 
-    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user (uuid, login_id, password, nickname, type, created_at)
-        VALUES (#{uuid}, #{loginId}, #{password}, #{nickname}, #{type}, #{createdAt})
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (uuid, login_id, password, username, type, created_at)
+        VALUES (#{uuid}, #{loginId}, #{password}, #{username}, #{type}, #{createdAt})
     </insert>
+
+    <select id="existsByLoginId" resultType="int">
+        SELECT COUNT(*)
+        FROM user
+        WHERE login_id = #{loginId}
+    </select>
 </mapper>

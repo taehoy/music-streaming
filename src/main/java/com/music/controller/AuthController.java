@@ -1,23 +1,19 @@
 package com.music.controller;
 
 import com.music.domain.RefreshToken;
-import com.music.domain.SignUpRequest;
+import com.music.domain.request.SignUpRequest;
 import com.music.domain.User;
 import com.music.domain.request.LoginRequest;
-import com.music.domain.response.ErrorResponse;
 import com.music.service.AuthService;
 import com.music.service.UserService;
 import com.music.util.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,6 +31,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequest request) {
         try {
+            log.info("회원가입 요청 : loginId = {}", request.loginId());
             authService.signUp(request);
             // 302 리다이렉트 응답
             return ResponseEntity.ok(Map.of("redirectTo", "/login"));

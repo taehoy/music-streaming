@@ -10,4 +10,6 @@ public interface UserMapper {
     User findById(Long id);
     User findByUuid(String uuid);
     User findByLoginId(String loginId);
+    int existsByLoginId(String loginId);
+
 }

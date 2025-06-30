@@ -1,4 +1,4 @@
-package com.music.domain;
+package com.music.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 

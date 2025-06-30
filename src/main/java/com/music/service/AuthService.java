@@ -1,22 +1,21 @@
 package com.music.service;
 
 import com.music.domain.RefreshToken;
-import com.music.domain.SignUpRequest;
+import com.music.domain.request.SignUpRequest;
 import com.music.domain.User;
 import com.music.domain.request.LoginRequest;
+import com.music.domain.user.UserType;
 import com.music.repository.AuthRepository;
 import com.music.repository.UserRepository;
 import com.music.util.JwtProvider;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,8 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     public User signUp(SignUpRequest request) {
-        if (userRepository.findByLoginId(request.loginId()) != null) {
+        int count = userRepository.existsByLoginId(request.loginId());
+        if (count > 0) {
             throw new IllegalArgumentException("이미 존재하는 유저 ID 입니다.");
         }
 
@@ -35,6 +35,8 @@ public class AuthService {
                 .loginId(request.loginId())
                 .password(passwordEncoder.encode(request.password()))
                 .username(request.username())
+                .uuid(UUID.randomUUID().toString())
+                .type(UserType.MEMBER)
                 .createdAt(LocalDateTime.now())
                 .build();
         User saveUser = userRepository.insertUser(user);
